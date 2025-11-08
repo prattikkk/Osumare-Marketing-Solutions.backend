@@ -1,0 +1,352 @@
+{
+  "info": {
+    "name": "Task Manager API",
+    "description": "Complete collection of Task Manager API endpoints with examples",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "adminKey",
+      "value": "admin-key-12345",
+      "type": "string"
+    },
+    {
+      "key": "userKey",
+      "value": "user-key-67890",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get All Tasks",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        },
+        "description": "Retrieve all tasks with default pagination (page 1, limit 10)"
+      }
+    },
+    {
+      "name": "Get Tasks with Pagination",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks?page=1&limit=5",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "5"
+            }
+          ]
+        },
+        "description": "Get tasks with custom pagination"
+      }
+    },
+    {
+      "name": "Get Tasks with Filters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks?status=pending&priority=high&sortBy=createdAt&order=desc",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"],
+          "query": [
+            {
+              "key": "status",
+              "value": "pending"
+            },
+            {
+              "key": "priority",
+              "value": "high"
+            },
+            {
+              "key": "sortBy",
+              "value": "createdAt"
+            },
+            {
+              "key": "order",
+              "value": "desc"
+            }
+          ]
+        },
+        "description": "Filter tasks by status and priority, sorted by creation date"
+      }
+    },
+    {
+      "name": "Search Tasks",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks?search=documentation",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"],
+          "query": [
+            {
+              "key": "search",
+              "value": "documentation"
+            }
+          ]
+        },
+        "description": "Search for tasks containing the keyword"
+      }
+    },
+    {
+      "name": "Get Task by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "1"]
+        },
+        "description": "Retrieve a specific task by its ID"
+      }
+    },
+    {
+      "name": "Create Task (Admin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{adminKey}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Implement new feature\",\n  \"description\": \"Add user notification system to the application\",\n  \"status\": \"pending\",\n  \"priority\": \"high\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        },
+        "description": "Create a new task with admin authentication"
+      }
+    },
+    {
+      "name": "Create Task (User)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{userKey}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Review code changes\",\n  \"description\": \"Review pull request #123 for the new dashboard feature\",\n  \"priority\": \"medium\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        },
+        "description": "Create a new task with user authentication"
+      }
+    },
+    {
+      "name": "Create Task - No Auth (Should Fail)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"This will fail\",\n  \"description\": \"No authentication provided\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        },
+        "description": "Attempt to create a task without authentication - should return 401"
+      }
+    },
+    {
+      "name": "Update Task Status",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{adminKey}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"completed\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "1"]
+        },
+        "description": "Update only the status of a task"
+      }
+    },
+    {
+      "name": "Update Task Multiple Fields",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{adminKey}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"in-progress\",\n  \"priority\": \"high\",\n  \"description\": \"Updated description with more details about the task\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/2",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "2"]
+        },
+        "description": "Update multiple fields of a task at once"
+      }
+    },
+    {
+      "name": "Delete Task (Admin)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{adminKey}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/3",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "3"]
+        },
+        "description": "Delete a task with admin authentication"
+      }
+    },
+    {
+      "name": "Delete Task (User - Should Fail)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "x-api-key",
+            "value": "{{userKey}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/2",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "2"]
+        },
+        "description": "Attempt to delete with user credentials - should return 403"
+      }
+    },
+    {
+      "name": "Validation Error - Short Title",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{adminKey}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"AB\",\n  \"description\": \"This should fail due to title being too short\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        },
+        "description": "Test validation - title too short, should return 400"
+      }
+    },
+    {
+      "name": "Validation Error - Missing Fields",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{adminKey}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Missing description\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        },
+        "description": "Test validation - missing required description field, should return 400"
+      }
+    },
+    {
+      "name": "Error - Invalid Task ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/999",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "999"]
+        },
+        "description": "Try to get a non-existent task - should return 404"
+      }
+    }
+  ]
+}

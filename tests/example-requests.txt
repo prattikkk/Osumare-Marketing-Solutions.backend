@@ -1,0 +1,250 @@
+# Task Manager API - Example Requests
+
+This file contains example curl commands for testing all API endpoints.
+Copy and paste these commands into your terminal (PowerShell).
+
+===============================================
+BASE SETUP
+===============================================
+
+Base URL: http://localhost:3000
+Admin API Key: admin-key-12345
+User API Key: user-key-67890
+
+
+===============================================
+1. GET ALL TASKS (No Authentication Required)
+===============================================
+
+# Basic request - Get all tasks
+curl http://localhost:3000/tasks
+
+# With pagination
+curl "http://localhost:3000/tasks?page=1&limit=5"
+
+# Filter by status
+curl "http://localhost:3000/tasks?status=pending"
+
+# Filter by priority
+curl "http://localhost:3000/tasks?priority=high"
+
+# Search in title and description
+curl "http://localhost:3000/tasks?search=documentation"
+
+# Sort by created date (descending)
+curl "http://localhost:3000/tasks?sortBy=createdAt&order=desc"
+
+# Sort by priority (descending)
+curl "http://localhost:3000/tasks?sortBy=priority&order=desc"
+
+# Combine multiple filters
+curl "http://localhost:3000/tasks?status=pending&priority=high&sortBy=createdAt&order=desc&page=1&limit=10"
+
+
+===============================================
+2. GET TASK BY ID (No Authentication Required)
+===============================================
+
+# Get task with ID 1
+curl http://localhost:3000/tasks/1
+
+# Get task with ID 2
+curl http://localhost:3000/tasks/2
+
+# Try to get non-existent task (will return 404)
+curl http://localhost:3000/tasks/999
+
+
+===============================================
+3. CREATE NEW TASK (Authentication Required)
+===============================================
+
+# Create a task with minimal fields
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"title\":\"Complete API testing\",\"description\":\"Test all endpoints thoroughly\"}"
+
+# Create a task with all fields
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"title\":\"Fix login bug\",\"description\":\"Resolve authentication issue on login page\",\"status\":\"pending\",\"priority\":\"high\"}"
+
+# Create task with user key (should work)
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: user-key-67890" `
+  -d "{\"title\":\"Update user profile\",\"description\":\"Add bio field to user profile page\",\"priority\":\"medium\"}"
+
+# Try to create without API key (will fail - 401)
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -d "{\"title\":\"This will fail\",\"description\":\"No authentication provided\"}"
+
+# Try to create with invalid data (will fail - 400)
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"title\":\"AB\",\"description\":\"Too short title\"}"
+
+
+===============================================
+4. UPDATE TASK (Authentication Required)
+===============================================
+
+# Update task status
+curl -X PUT http://localhost:3000/tasks/1 `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"status\":\"completed\"}"
+
+# Update task priority
+curl -X PUT http://localhost:3000/tasks/1 `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"priority\":\"low\"}"
+
+# Update multiple fields
+curl -X PUT http://localhost:3000/tasks/2 `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"status\":\"in-progress\",\"priority\":\"high\",\"description\":\"Updated description with more details\"}"
+
+# Update with user key (should work)
+curl -X PUT http://localhost:3000/tasks/2 `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: user-key-67890" `
+  -d "{\"status\":\"completed\"}"
+
+# Try to update without API key (will fail - 401)
+curl -X PUT http://localhost:3000/tasks/1 `
+  -H "Content-Type: application/json" `
+  -d "{\"status\":\"completed\"}"
+
+# Try to update non-existent task (will fail - 404)
+curl -X PUT http://localhost:3000/tasks/999 `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"status\":\"completed\"}"
+
+
+===============================================
+5. DELETE TASK (Admin Only)
+===============================================
+
+# Delete a task (admin key)
+curl -X DELETE http://localhost:3000/tasks/3 `
+  -H "x-api-key: admin-key-12345"
+
+# Try to delete with user key (will fail - 403)
+curl -X DELETE http://localhost:3000/tasks/2 `
+  -H "x-api-key: user-key-67890"
+
+# Try to delete without API key (will fail - 401)
+curl -X DELETE http://localhost:3000/tasks/1
+
+# Try to delete non-existent task (will fail - 404)
+curl -X DELETE http://localhost:3000/tasks/999 `
+  -H "x-api-key: admin-key-12345"
+
+
+===============================================
+6. TESTING SCENARIOS
+===============================================
+
+# Scenario 1: Complete workflow
+# Step 1: Create a task
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"title\":\"Implement search feature\",\"description\":\"Add search functionality to the dashboard\",\"priority\":\"high\"}"
+
+# Step 2: Get the task (use the ID from previous response)
+curl http://localhost:3000/tasks/4
+
+# Step 3: Update the task status to in-progress
+curl -X PUT http://localhost:3000/tasks/4 `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"status\":\"in-progress\"}"
+
+# Step 4: Complete the task
+curl -X PUT http://localhost:3000/tasks/4 `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"status\":\"completed\"}"
+
+# Step 5: Delete the task
+curl -X DELETE http://localhost:3000/tasks/4 `
+  -H "x-api-key: admin-key-12345"
+
+
+# Scenario 2: Filter high priority pending tasks
+curl "http://localhost:3000/tasks?status=pending&priority=high&sortBy=createdAt&order=desc"
+
+
+# Scenario 3: Get recently updated tasks
+curl "http://localhost:3000/tasks?sortBy=updatedAt&order=desc&limit=5"
+
+
+===============================================
+7. ERROR HANDLING EXAMPLES
+===============================================
+
+# Invalid task ID (not a number)
+curl http://localhost:3000/tasks/abc
+
+# Invalid status value
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"title\":\"Test task\",\"description\":\"Testing validation\",\"status\":\"invalid-status\"}"
+
+# Missing required fields
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{}"
+
+# Title too short
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: admin-key-12345" `
+  -d "{\"title\":\"AB\",\"description\":\"This should fail due to short title\"}"
+
+# Invalid API key
+curl -X POST http://localhost:3000/tasks `
+  -H "Content-Type: application/json" `
+  -H "x-api-key: invalid-key" `
+  -d "{\"title\":\"Test\",\"description\":\"Test description\"}"
+
+
+===============================================
+8. PAGINATION EXAMPLES
+===============================================
+
+# Get first page (2 items per page)
+curl "http://localhost:3000/tasks?page=1&limit=2"
+
+# Get second page
+curl "http://localhost:3000/tasks?page=2&limit=2"
+
+# Get all tasks on one page (max 100)
+curl "http://localhost:3000/tasks?limit=100"
+
+# Try to exceed max limit (will be capped at 100)
+curl "http://localhost:3000/tasks?limit=200"
+
+
+===============================================
+NOTES
+===============================================
+
+1. Replace task IDs in the examples with actual IDs from your server
+2. Make sure the server is running before testing
+3. Watch the server logs to see request processing
+4. All timestamps are in ISO 8601 format
+5. Use PowerShell for these curl commands on Windows
+
+For automated testing, run: ./tests/test-api.ps1
